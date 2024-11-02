@@ -1,0 +1,1 @@
+. "/home/agustin/Documents/importante/facultad/SistOperativos1/monitor_program/build/Release/generators/deactivate_conanrunenv-release-x86_64.sh"
