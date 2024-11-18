@@ -1,28 +1,34 @@
 cmake_minimum_required(VERSION 3.14)
 project(Monitor VERSION 1.0 LANGUAGES C)
 
-# Incluir el toolchain de Conan
+# Include the Conan toolchain for dependency management
 include(${CMAKE_BINARY_DIR}/Release/generators/conan_toolchain.cmake)
 
-# Configurar CMAKE_PREFIX_PATH para encontrar dependencias en Release/generators
+# Configure CMAKE_PREFIX_PATH for Conan dependencies
 set(CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/Release/generators" ${CMAKE_PREFIX_PATH})
 
-# Encontrar las dependencias gestionadas por Conan
+# Find dependencies managed by Conan
 find_package(cJSON REQUIRED)
 
-# Incluir directorios de encabezados propios
+# Include directories for header files
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/lib)
+include_directories(
+    ../../../lib/memory/include
+    # Add any additional include directories here
+)
 
-# Añadir el ejecutable
-add_executable(monitoring_project
+# Add the Monitoring project library
+add_library(monitoring_project STATIC
     src/main.c
     src/metrics.c
     src/expose_metrics.c
     src/json_metrics.c
+    ../../../lib/memory/src/memory.c
+    ../../../lib/memory/src/stats_memory.c
 )
 
-# Vincular las librerías libprom, libpromhttp y cJSON
+# Link necessary libraries to the Monitoring project
 target_link_libraries(monitoring_project
     /usr/local/lib/libprom.so
     /usr/local/lib/libpromhttp.so
@@ -31,9 +37,10 @@ target_link_libraries(monitoring_project
     pthread
 )
 
-# Establecer el directorio de salida del ejecutable a la carpeta raíz del proyecto
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
-
-
-
+# Set the output directory for the library
+set_target_properties(monitoring_project PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin"
+)
 
